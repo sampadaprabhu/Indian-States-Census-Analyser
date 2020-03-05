@@ -21,46 +21,19 @@ public class CensusAnalyser {
         //censusMap=new HashMap();
     }
 
-    public int loadDataIndiaStateCensus(String csvFilePath) {
-       censusMap=new CensusLoader().loadCensusData(csvFilePath,IndiaStateCensus.class);
+    public int loadDataIndiaStateCensus(String... csvFilePath) {
+       censusMap=new CensusLoader().loadCensusData(IndiaStateCensus.class,csvFilePath);
         censusList=censusMap.values().stream().collect(Collectors.toList());
        return censusMap.size();
     }
 
 
-    public int loadDataUSStateCensus(String csvFilePath) {
-        censusMap=new CensusLoader().loadCensusData(csvFilePath,USCensusCSV.class);
+    public int loadDataUSStateCensus(String... csvFilePath) {
+        censusMap=new CensusLoader().loadCensusData(USCensusCSV.class,csvFilePath);
         censusList=censusMap.values().stream().collect(Collectors.toList());
         return censusMap.size();
     }
 
-    public int loadDataIndiaStateCode(String csvFilePath){
-        try(Reader reader = Files.newBufferedReader(Paths.get(csvFilePath));) {
-            ICSVBuilder csvBuilder=CSVBuilderFactory.createBuilder();
-            Iterator<IndiaStateCode> stateCode= csvBuilder.getCSVFileIterator(reader,IndiaStateCode.class);
-            Iterable<IndiaStateCode> stateCodeIterable= () -> stateCode;
-            StreamSupport.stream(stateCodeIterable.spliterator(),false)
-                    .filter(csvState -> censusMap.get(csvState.stateName) !=null)
-                    .forEach(csvState ->censusMap.get(csvState.stateName).stateCode=csvState.stateCode);
-
-//            while(stateCode.hasNext()){
-//                IndiaStateCode code=stateCode.next();
-//                CensusDTO csv=censusMap.get(code.stateCode);
-//                if(csv == null){
-//                    continue;
-//                }else{
-//                    csv.stateCode=code.stateCode;
-//                }
-//
-//            }
-//            censusList=censusMap.values().stream().collect(Collectors.toList());
-            return censusMap.size();
-        } catch (IOException ioe) {
-            throw new CensusAnalyserException(ioe.getMessage(),CensusAnalyserException.ExceptionType.CENSUS_FILE_PROBLEM);
-        } catch (CSVBuilderException e) {
-           throw new CensusAnalyserException(e.getMessage(),e.type.name());
-        }
-    }
 
     private <E> int getCount(Iterator<E> Iterator) {
         Iterable<E> census=()-> Iterator;

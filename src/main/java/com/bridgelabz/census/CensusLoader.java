@@ -11,8 +11,8 @@ import java.util.stream.StreamSupport;
 public class CensusLoader {
     List<CensusDTO> censusList=new ArrayList<>();
     Map<String, CensusDTO> censusMap=new HashMap<>();
-    public  <E> Map<String,CensusDTO> loadCensusData(String csvFilePath,Class<E> censusCSVClass) {
-        try(Reader reader = Files.newBufferedReader(Paths.get(csvFilePath));) {
+    public  <E> Map<String,CensusDTO> loadCensusData(Class<E> censusCSVClass,String... csvFilePath) {
+        try(Reader reader = Files.newBufferedReader(Paths.get(csvFilePath[0]));) {
             ICSVBuilder csvBuilder= CSVBuilderFactory.createBuilder();
             Iterator<E> stateCensus= csvBuilder.getCSVFileIterator(reader,censusCSVClass);
             Iterable<E> stateCensusIterable=() ->stateCensus;
@@ -29,7 +29,9 @@ public class CensusLoader {
                         .map(USCensusCSV.class::cast)
                         .forEach(censusCSV -> censusMap.put(censusCSV.state, new CensusDTO(censusCSV)));
             }
-
+            if (csvFilePath.length==1){
+                return censusMap;}
+            this.loadDataIndiaStateCode(censusMap,csvFilePath[1]);
             return censusMap;
         } catch (IOException ioe) {
             throw new CensusAnalyserException(ioe.getMessage(),CensusAnalyserException.ExceptionType.CENSUS_FILE_PROBLEM);
@@ -37,5 +39,34 @@ public class CensusLoader {
             throw new CensusAnalyserException(e.getMessage(),e.type.name());
         }
     }
+
+    private int loadDataIndiaStateCode(Map<String, CensusDTO> censusMap,String csvFilePath){
+        try(Reader reader = Files.newBufferedReader(Paths.get(csvFilePath));) {
+            ICSVBuilder csvBuilder=CSVBuilderFactory.createBuilder();
+            Iterator<IndiaStateCode> stateCode= csvBuilder.getCSVFileIterator(reader,IndiaStateCode.class);
+            Iterable<IndiaStateCode> stateCodeIterable= () -> stateCode;
+            StreamSupport.stream(stateCodeIterable.spliterator(),false)
+                    .filter(csvState -> censusMap.get(csvState.stateName) !=null)
+                    .forEach(csvState ->censusMap.get(csvState.stateName).stateCode=csvState.stateCode);
+
+//            while(stateCode.hasNext()){
+//                IndiaStateCode code=stateCode.next();
+//                CensusDTO csv=censusMap.get(code.stateCode);
+//                if(csv == null){
+//                    continue;
+//                }else{
+//                    csv.stateCode=code.stateCode;
+//                }
+//
+//            }
+//            censusList=censusMap.values().stream().collect(Collectors.toList());
+            return censusMap.size();
+        } catch (IOException ioe) {
+            throw new CensusAnalyserException(ioe.getMessage(),CensusAnalyserException.ExceptionType.CENSUS_FILE_PROBLEM);
+        } catch (CSVBuilderException e) {
+            throw new CensusAnalyserException(e.getMessage(),e.type.name());
+        }
+    }
+
 
 }
