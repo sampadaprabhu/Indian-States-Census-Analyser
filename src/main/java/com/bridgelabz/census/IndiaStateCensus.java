@@ -10,10 +10,10 @@ public class IndiaStateCensus {
     public int population;
 
     @CsvBindByName(column = "AreaInSqKm", required = true)
-    public String areaInSqKm;
+    public double areaInSqKm;
 
     @CsvBindByName(column = "DensityPerSqKm", required = true)
-    public String densityPerSqKm;
+    public double densityPerSqKm;
 
     @Override
     public String toString(){
