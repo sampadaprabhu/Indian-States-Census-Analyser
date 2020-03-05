@@ -43,17 +43,21 @@ public class CensusAnalyser {
         try(Reader reader = Files.newBufferedReader(Paths.get(csvFilePath));) {
             ICSVBuilder csvBuilder=CSVBuilderFactory.createBuilder();
             Iterator<IndiaStateCode> stateCode= csvBuilder.getCSVFileIterator(reader,IndiaStateCode.class);
+            Iterable<IndiaStateCode> stateCodeIterable= () -> stateCode;
+            StreamSupport.stream(stateCodeIterable.spliterator(),false)
+                    .filter(csvState -> censusMap.get(csvState.stateName) !=null)
+                    .forEach(csvState ->censusMap.get(csvState.stateName).stateCode=csvState.stateCode);
 
-            while(stateCode.hasNext()){
-                IndiaStateCode code=stateCode.next();
-                IndiaCensusDTO csv=censusMap.get(code.stateCode);
-                if(csv == null){
-                    continue;
-                }else{
-                    csv.stateCode=code.stateCode;
-                }
-
-            }
+//            while(stateCode.hasNext()){
+//                IndiaStateCode code=stateCode.next();
+//                IndiaCensusDTO csv=censusMap.get(code.stateCode);
+//                if(csv == null){
+//                    continue;
+//                }else{
+//                    csv.stateCode=code.stateCode;
+//                }
+//
+//            }
 //            censusList=censusMap.values().stream().collect(Collectors.toList());
             return censusMap.size();
         } catch (IOException ioe) {
@@ -120,7 +124,6 @@ public class CensusAnalyser {
                 }
             }
         }
-
     }
 
 }
