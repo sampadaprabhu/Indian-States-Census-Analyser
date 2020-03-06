@@ -1,7 +1,5 @@
 package com.bridgelabz.census;
 
-import static org.graalvm.compiler.nodeinfo.Verbosity.Id;
-
 public class CensusDTO {
     public String state;
     public int population;
@@ -17,14 +15,21 @@ public class CensusDTO {
 
     }
 
-    public CensusDTO(USCensusCSV censusUS) {
-        state=censusUS.state;
-        stateCode=censusUS.stateId;
-        population=censusUS.population;
-        totalArea=censusUS.totalArea;
-        populationDensity=censusUS.populationDensity;
-
-
-
+    public CensusDTO(USStateCensus census) {
+        state=census.state;
+        stateCode=census.stateId;
+        population=census.population;
+        totalArea=census.totalArea;
+        populationDensity=census.populationDensity;
     }
+
+//    public Object getCensusDTO(CensusDTO var) {
+//        if (CensusAnalyser.Country.US){
+//            return new USStateCensus(state,stateCode,population,totalArea,populationDensity);
+//        }
+//        else if (CensusAnalyser.Country.INDIA){
+//            return new IndiaStateCensus(state,stateCode,population,totalArea,populationDensity);
+//        }
+//        return null;
+//    }
 }

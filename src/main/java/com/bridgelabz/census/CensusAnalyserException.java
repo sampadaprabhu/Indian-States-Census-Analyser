@@ -3,7 +3,7 @@ package com.bridgelabz.census;
 public class CensusAnalyserException extends RuntimeException{
 
     public enum ExceptionType{
-        NO_CENSUS_DATA,CENSUS_FILE_PROBLEM;
+        NO_CENSUS_DATA,INVALID_COUNTRY,CENSUS_FILE_PROBLEM;
     }
     public ExceptionType type;
 
